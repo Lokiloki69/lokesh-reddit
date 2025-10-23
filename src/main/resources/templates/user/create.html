@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head><title>Sign Up</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="bi bi-person-plus"></i> Sign Up</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Social Sign Up Options -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="button" class="btn btn-outline-secondary" onclick="alert('Google OAuth not implemented yet')">
+                            <i class="bi bi-google me-2"></i>
+                            Continue with Google
+                        </button>
+                        <button type="button" class="btn btn-outline-dark" onclick="alert('Apple OAuth not implemented yet')">
+                            <i class="bi bi-apple me-2"></i>
+                            Continue with Apple
+                        </button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="d-flex align-items-center my-4">
+                        <hr class="flex-grow-1">
+                        <span class="text-muted small text-uppercase px-3">or</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <!-- Registration Form -->
+                    <form th:action="@{/register}" th:object="${userDto}" method="post">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" th:field="*{email}" id="email" placeholder="Email" required>
+                            <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback d-block" th:errors="*{email}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="Password" required>
+                            <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback d-block" th:errors="*{password}"></div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to get emails about cool stuff on Reddit
+                            </label>
+                        </div>
+
+                        <!--Spring Gonna Handel it internally-->
+                        <!-- CSRF Token -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}"/>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Sign Up
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                Already a redditor? <a th:href="@{/login}" class="text-decoration-none">Log In</a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Info Card -->
+            <div class="card shadow mt-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle"></i> Come for the cats. Stay for the empathy.</h5>
+                    <p class="card-text text-muted small">
+                        By having an account, you can join, vote, and comment on all your favorite Reddit content.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
