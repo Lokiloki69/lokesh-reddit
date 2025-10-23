@@ -95,7 +95,7 @@ public class CommentService {
                             .username("defaultUser")
                             .email("default@reddit.com")
                             .password("password")
-                            .enabled(true)
+//                            .enabled(true)
                             .build();
                     return userRepository.save(newUser);
                 });

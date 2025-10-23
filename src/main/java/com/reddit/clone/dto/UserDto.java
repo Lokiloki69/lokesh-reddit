@@ -17,21 +17,23 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
-    private String username;
+//    @NotBlank(message = "Username is required")
+//    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
+//    private String username;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Please provide a valid email address")
     private String email;
 
-    private Instant createdDate;
+    private String password;
 
-    private Boolean enabled;
+//    private Instant createdDate;
 
-    private Integer postCount;
+//    private Boolean enabled;
 
-    private Integer commentCount;
+//    private Integer postCount;
 
-    private Integer communityCount;
+//    private Integer commentCount;
+
+//    private Integer communityCount;
 }
