@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Communities</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-people"></i> Communities</h2>
+                <a th:href="@{/communities/create}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create Community
+                </a>
+            </div>
+
+            <!-- Search Form -->
+            <form th:action="@{/communities}" method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" th:value="${search}"
+                           class="form-control" placeholder="Search communities...">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Communities Grid -->
+            <div class="row" th:if="${communities.hasContent()}">
+                <div class="col-md-6 col-lg-4 mb-4" th:each="community : ${communities.content}">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a th:href="@{'/communities/' + ${community.id}}"
+                                   class="text-decoration-none"
+                                   th:text="'r/' + ${community.name}"></a>
+                            </h5>
+                            <p class="card-text text-muted" th:text="${community.description}">
+                                Community description
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i>
+                                    <span th:text="${#temporals.format(community.createdDate, 'MMM dd, yyyy')}"></span>
+                                </small>
+                                <span class="badge bg-secondary" th:text="${community.type}"></span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100" role="group">
+                                <a th:href="@{'/communities/' + ${community.id}}"
+                                   class="btn btn-outline-primary btn-sm">View</a>
+                                <a th:href="@{'/communities/' + ${community.id} + '/edit'}"
+                                   class="btn btn-outline-secondary btn-sm">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${!communities.hasContent()}" class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h3 class="text-muted mt-3">No communities found</h3>
+                <p class="text-muted">Be the first to create a community!</p>
+                <a th:href="@{/communities/create}" class="btn btn-primary">Create Community</a>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${communities.totalPages > 1}" aria-label="Communities pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/communities(page=${currentPage - 1}, search=${search})}">
+                            Previous
+                        </a>
+                    </li>
+
+                    <li th:each="i : ${#numbers.sequence(0, communities.totalPages - 1)}"
+                        class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/communities(page=${i}, search=${search})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == communities.totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/communities(page=${currentPage + 1}, search=${search})}">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> About Communities</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Communities are spaces where people with similar interests can gather,
+                        share content, and discuss topics they care about.
+                    </p>
+                    <a th:href="@{/communities/create}" class="btn btn-primary w-100">
+                        Create Your Community
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

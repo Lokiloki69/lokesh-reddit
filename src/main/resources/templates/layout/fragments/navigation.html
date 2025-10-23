@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm py-1 px-2">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center fw-bold" th:href="@{/}">
+                <img src="/images/reddit-logo.png" alt="Reddit" width="32" class="me-2"> Reddit
+            </a>
+            <form class="mx-auto w-50 d-none d-lg-flex">
+                <input class="form-control" type="search" placeholder="Search Reddit" aria-label="Search" style="width: 100%;">
+            </form>
+            <div class="d-flex align-items-center ms-auto">
+                <a class="btn btn-primary me-2" th:href="@{/posts/create}">
+                    <i class="bi bi-plus-circle"></i> New Post
+                </a>
+                <!-- Optional: User dropdown, notification icons -->
+            </div>
+        </div>
+    </nav>
+</div>
+
+</html>

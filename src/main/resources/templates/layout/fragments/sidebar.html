@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="sidebar">
+    <div class="bg-light border-end min-vh-100 d-flex flex-column align-items-start p-3" style="width: 220px;">
+        <a class="navbar-brand mb-3 fw-bold d-flex align-items-center" th:href="@{/}">
+            <img src="/images/reddit-logo.png" style="width:32px;height:32px;" alt="Reddit" class="me-2"/>
+            Reddit
+        </a>
+        <ul class="nav nav-pills flex-column mb-auto w-100">
+            <li class="nav-item">
+                <a th:href="@{/'/}" class="nav-link active"><i class="bi bi-house"></i> Home</a>
+            </li>
+            <li>
+                <a th:href="@{/communities}" class="nav-link text-dark"><i class="bi bi-people"></i> Communities</a>
+            </li>
+            <li>
+                <a th:href="@{/posts}" class="nav-link text-dark"><i class="bi bi-collection"></i> Posts</a>
+            </li>
+        </ul>
+        <hr class="w-100"/>
+        <div class="w-100">
+            <strong class="text-muted small">Recent</strong>
+            <ul class="nav flex-column">
+                <li th:each="comm : ${recentCommunities}">
+                    <a th:href="@{'/communities/' + ${comm.id}}" class="nav-link small" th:text="${comm.name}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
