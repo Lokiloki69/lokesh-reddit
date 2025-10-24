@@ -164,6 +164,7 @@ public String createPost(
             PostDto post = postService.getPostById(id);
             model.addAttribute("postDto", post);
             model.addAttribute("communities", communityService.getAllCommunities());
+            model.addAttribute("existingFiles", postService.getPostFiles(id)); // Get existing files
             return "post/edit";
         } catch (Exception e) {
             return "redirect:/posts?error=Post not found";
@@ -175,24 +176,29 @@ public String createPost(
             @PathVariable Long id,
             @Valid @ModelAttribute PostDto postDto,
             BindingResult result,
+            @RequestParam(value = "files", required = false) MultipartFile[] files,
+            @RequestParam(value = "deleteFileIds", required = false) List<Long> deleteFileIds,
             Model model,
             RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             model.addAttribute("communities", communityService.getAllCommunities());
+            model.addAttribute("existingFiles", postService.getPostFiles(id));
             return "post/edit";
         }
 
         try {
-            postService.updatePost(id, postDto);
+            postService.updatePostWithFiles(id, postDto, files, deleteFileIds);
             redirectAttributes.addFlashAttribute("success", "Post updated successfully!");
             return "redirect:/posts/" + id;
         } catch (Exception e) {
             result.rejectValue("title", "error.postDto", e.getMessage());
             model.addAttribute("communities", communityService.getAllCommunities());
+            model.addAttribute("existingFiles", postService.getPostFiles(id));
             return "post/edit";
         }
     }
+
 
     @PostMapping("/{id}/delete")
     public String deletePost(@PathVariable Long id, RedirectAttributes redirectAttributes) {

@@ -1,39 +1,112 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
+
 <head><title>Edit Post</title></head>
 <body>
 <div layout:fragment="content">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow">
-                <div class="card-header"><h3>Edit Post</h3></div>
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="bi bi-pencil-square"></i> Edit Post</h3>
+                </div>
                 <div class="card-body">
-                    <form th:action="@{'/posts/' + ${postDto.id} + '/edit'}" th:object="${postDto}" method="post">
+                    <form th:action="@{'/posts/' + ${postDto.id} + '/edit'}"
+                          th:object="${postDto}"
+                          method="post"
+                          enctype="multipart/form-data">
+
                         <div class="mb-3">
-                            <label>Title</label>
-                            <input type="text" th:field="*{title}" class="form-control"/>
+                            <label for="title" class="form-label">Title *</label>
+                            <input type="text" class="form-control" th:field="*{title}" id="title"
+                                   placeholder="Title"
+                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''">
+                            <div th:if="${#fields.hasErrors('title')}"
+                                 class="invalid-feedback" th:errors="*{title}"></div>
                         </div>
+
                         <div class="mb-3">
-                            <label>Content</label>
-                            <textarea th:field="*{content}" class="form-control" rows="5"></textarea>
+                            <label for="communityName" class="form-label">Community *</label>
+                            <select class="form-select" th:field="*{communityName}" id="communityName"
+                                    th:classappend="${#fields.hasErrors('communityName')} ? 'is-invalid' : ''"
+                                    required>
+                                <option th:each="community : ${communities}"
+                                        th:value="${community.name}"
+                                        th:text="${community.name}"></option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('communityName')}"
+                                 class="invalid-feedback" th:errors="*{communityName}"></div>
                         </div>
+
                         <div class="mb-3">
-                            <label>Image URL</label>
-                            <input type="text" th:field="*{imageUrl}" class="form-control"/>
-                        </div>
-                        <div class="mb-3">
-                            <label>Post Type</label>
-                            <select th:field="*{postType}" class="form-select">
+                            <label for="postType" class="form-label">Post Type</label>
+                            <select class="form-select" th:field="*{postType}" id="postType">
                                 <option value="TEXT">Text</option>
                                 <option value="IMAGE">Image</option>
                                 <option value="LINK">Link</option>
                             </select>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" th:field="*{content}" id="content" rows="5"></textarea>
+                        </div>
+
+                        <!-- Existing Files Section -->
+                        <div class="mb-3" th:if="${existingFiles != null and !existingFiles.isEmpty()}">
+                            <label class="form-label">Existing Media Files</label>
+                            <div class="row g-2">
+                                <div th:each="file : ${existingFiles}" class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body p-2">
+                                            <!-- Display Image -->
+                                            <div th:if="${file.fileType.startsWith('image')}">
+                                                <img th:src="${file.fileUrl}"
+                                                     class="img-fluid rounded mb-2"
+                                                     alt="Media file"
+                                                     style="max-height: 150px; object-fit: cover; width: 100%;">
+                                            </div>
+                                            <!-- Display Video -->
+                                            <div th:if="${file.fileType.startsWith('video')}">
+                                                <video controls class="w-100 rounded mb-2" style="max-height: 150px;">
+                                                    <source th:src="${file.fileUrl}" th:type="${file.fileType}">
+                                                </video>
+                                            </div>
+                                            <p class="small mb-1" th:text="${file.fileName}">filename.jpg</p>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="deleteFileIds"
+                                                       th:value="${file.id}"
+                                                       th:id="'delete-' + ${file.id}">
+                                                <label class="form-check-label text-danger"
+                                                       th:for="'delete-' + ${file.id}">
+                                                    <i class="bi bi-trash"></i> Delete this file
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload New Files -->
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Upload New Files (images, videos, gifs)</label>
+                            <input type="file" class="form-control" id="files" name="files"
+                                   multiple accept="image/*,video/*,.gif" />
+                            <small class="text-muted">You can upload multiple files at once</small>
+                        </div>
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a th:href="@{/posts}" class="btn btn-secondary me-md-2">Cancel</a>
-                            <button class="btn btn-primary" type="submit">Save</button>
+                            <a th:href="@{'/posts/' + ${postDto.id}}"
+                               class="btn btn-secondary me-md-2">Cancel</a>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-check-circle"></i> Update Post
+                            </button>
                         </div>
                     </form>
                 </div>
