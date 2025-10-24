@@ -58,6 +58,84 @@
 <!--</div>-->
 <!--</body>-->
 <!--</html>-->
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en"-->
+<!--      xmlns:th="http://www.thymeleaf.org"-->
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layout/base}">-->
+
+<!--<head><title>Post Details</title></head>-->
+<!--<body>-->
+<!--<div layout:fragment="content">-->
+<!--    <div class="row g-4">-->
+<!--        <div class="col-lg-8">-->
+<!--            <div class="card mb-3">-->
+<!--                <div class="card-body">-->
+<!--                    <h2 class="card-title mb-2" th:text="${post.title}"></h2>-->
+<!--                    <div class="mb-2 text-muted small">-->
+<!--                        r/<span th:text="${post.communityName}"></span> &bullet;-->
+<!--                        by <span th:text="${post.username}"></span> &bullet;-->
+<!--                        <span th:text="${#temporals.format(post.createdDate, 'MMM dd, yyyy')}"></span>-->
+<!--                    </div>-->
+<!--                    <p class="card-text" th:text="${post.content}"></p>-->
+
+<!--                    <div th:if="${post.primaryMediaUrl != null}" class="mt-3 mb-3">-->
+
+<!--                        <div th:if="${post.primaryMediaType != null and post.primaryMediaType.startsWith('image')}">-->
+<!--                            <img th:src="${post.primaryMediaUrl}" class="img-fluid rounded" alt="Post Image" />-->
+<!--                        </div>-->
+
+<!--                        <div th:if="${post.primaryMediaType != null and post.primaryMediaType.startsWith('video')}">-->
+<!--                            <video controls preload="metadata" class="img-fluid rounded" style="max-width: 100%; height: auto;">-->
+<!--                                <source th:src="${post.primaryMediaUrl}" th:type="${post.primaryMediaType}">-->
+<!--                                Your browser does not support the video tag.-->
+<!--                            </video>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div th:if="${post.primaryMediaUrl == null and post.imageUrl != null}">-->
+<!--                        <img th:src="${post.imageUrl}" class="img-fluid rounded" alt="Post Image" />-->
+<!--                    </div>-->
+<!--                    <div class="d-flex justify-content-between align-items-center mt-2">-->
+<!--                        <div>-->
+<!--                            <span class="badge bg-success me-2" th:text="${post.voteCount}"></span>-->
+<!--                            <span class="text-muted small"><i class="bi bi-chat"></i> <span th:text="${post.commentCount}"></span> Comments</span>-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                            <form th:action="@{/api/votes}" th:object="${voteDto}" method="post">-->
+<!--                                <input type="hidden" th:field="*{postId}" th:value="${post.id}" />-->
+<!--                                <button type="submit" name="voteType" value="UPVOTE" class="btn btn-success btn-sm">Upvote</button>-->
+<!--                                <button type="submit" name="voteType" value="DOWNVOTE" class="btn btn-danger btn-sm">Downvote</button>-->
+<!--                            </form>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="card mt-4">-->
+<!--                <div class="card-header d-flex align-items-center">-->
+<!--                    <h4 class="mb-0"><i class="bi bi-chat"></i> Comments</h4>-->
+<!--                </div>-->
+<!--                <div class="card-body">-->
+<!--                    <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${commentDto}" method="post">-->
+<!--                        <div class="mb-3">-->
+<!--                            <textarea class="form-control" th:field="*{text}" placeholder="Write a comment..." required></textarea>-->
+<!--                        </div>-->
+<!--                        <button class="btn btn-primary" type="submit">Add Comment</button>-->
+<!--                    </form>-->
+<!--                    <div class="mt-4" th:replace="comment/fragments/comment-list :: commentList(comments=${comments})"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
@@ -81,11 +159,9 @@
                     <p class="card-text" th:text="${post.content}"></p>
 
                     <div th:if="${post.primaryMediaUrl != null}" class="mt-3 mb-3">
-
                         <div th:if="${post.primaryMediaType != null and post.primaryMediaType.startsWith('image')}">
                             <img th:src="${post.primaryMediaUrl}" class="img-fluid rounded" alt="Post Image" />
                         </div>
-
                         <div th:if="${post.primaryMediaType != null and post.primaryMediaType.startsWith('video')}">
                             <video controls preload="metadata" class="img-fluid rounded" style="max-width: 100%; height: auto;">
                                 <source th:src="${post.primaryMediaUrl}" th:type="${post.primaryMediaType}">
@@ -93,17 +169,16 @@
                             </video>
                         </div>
                     </div>
-
                     <div th:if="${post.primaryMediaUrl == null and post.imageUrl != null}">
                         <img th:src="${post.imageUrl}" class="img-fluid rounded" alt="Post Image" />
                     </div>
 
-                    <!-- Voting and Stats Section -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div class="d-flex align-items-center">
-                            <!-- Vote Buttons -->
+
                             <form th:action="@{/api/votes}" method="post" class="d-inline me-3">
                                 <input type="hidden" name="postId" th:value="${post.id}" />
+
                                 <button type="submit" name="voteType" value="UPVOTE" class="btn btn-sm btn-outline-success">
                                     <i class="bi bi-arrow-up-circle"></i>
                                 </button>
@@ -113,27 +188,16 @@
                                 </button>
                             </form>
 
-                            <!-- Comment Count -->
                             <span class="text-muted">
                                 <i class="bi bi-chat"></i>
                                 <span th:text="${post.commentCount}"></span> Comments
                             </span>
                         </div>
 
-                        <!-- Edit/Delete buttons (optional) -->
-<!--                        <div>-->
-<!--                            <a th:href="@{'/posts/' + ${post.id} + '/edit'}" class="btn btn-sm btn-outline-secondary">-->
-<!--                                <i class="bi bi-pencil"></i> Edit-->
-<!--                            </a>-->
-<!--                        </div>-->
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-=======
 
-            <!-- Comments Section -->
->>>>>>> 5a64dd7774e99d2cd04fecdd50674829695f36d8
             <div class="card mt-4">
                 <div class="card-header d-flex align-items-center">
                     <h4 class="mb-0"><i class="bi bi-chat"></i> Comments</h4>
@@ -148,14 +212,7 @@
                             <i class="bi bi-send"></i> Add Comment
                         </button>
                     </form>
-<<<<<<< HEAD
-                    <div class="mt-4" th:replace="comment/fragments/comment-list :: commentList(comments=${comments})"></div>
-                </div>
-            </div>
-        </div>
-=======
 
-                    <!-- Comment List -->
                     <div class="mt-4" th:if="${comments != null and !comments.isEmpty()}">
                         <div th:replace="comment/fragments/comment-list :: commentList(comments=${comments})"></div>
                     </div>
@@ -165,78 +222,7 @@
                 </div>
             </div>
         </div>
-
-        <!-- Sidebar (optional) -->
-<!--        <div class="col-lg-4">-->
-<!--            <div class="card">-->
-<!--                <div class="card-header">About this post</div>-->
-<!--                <div class="card-body">-->
-<!--                    <p class="small text-muted">Posted in r/<span th:text="${post.communityName}"></span></p>-->
-<!--                    <a th:href="@{'/communities/' + ${post.communityId}}" class="btn btn-sm btn-outline-primary w-100">-->
-<!--                        View Community-->
-<!--                    </a>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
->>>>>>> 5a64dd7774e99d2cd04fecdd50674829695f36d8
     </div>
 </div>
-
-
-<!--<div layout:fragment="content">-->
-<!--    <div class="row g-4">-->
-<!--        <div class="col-lg-8">-->
-<!--            <div class="card mb-3">-->
-<!--                <div class="card-body">-->
-<!--                    <h2 class="card-title mb-2" th:text="${post.title}"></h2>-->
-<!--                    <div class="mb-2 text-muted small">-->
-<!--                        r/<span th:text="${post.communityName}"></span> &bullet;-->
-<!--                        by <span th:text="${post.username}"></span> &bullet;-->
-<!--                        <span th:text="${#temporals.format(post.createdDate, 'MMM dd, yyyy')}"></span>-->
-<!--                    </div>-->
-<!--                    <p class="card-text" th:text="${post.content}"></p>-->
-<!--                    <div th:if="${post.imageUrl}">-->
-<!--                        <img th:src="${post.imageUrl}" class="img-fluid rounded" alt="Post Image" />-->
-<!--                    </div>-->
-<!--                    <div class="d-flex justify-content-between align-items-center mt-2">-->
-<!--                        <div>-->
-<!--                            <span class="badge bg-success me-2" th:text="${post.voteCount}"></span>-->
-<!--                            <span class="text-muted small"><i class="bi bi-chat"></i> <span th:text="${post.commentCount}"></span> Comments</span>-->
-<!--                        </div>-->
-<!--                        <div>-->
-<!--                            <form th:action="@{/api/votes}" method="post" class="d-inline">-->
-<!--                                <input type="hidden" name="postId" th:value="${post.id}" />-->
-<!--                                <button type="submit" name="voteType" value="UPVOTE" class="btn btn-success btn-sm">-->
-<!--                                    <i class="bi bi-arrow-up"></i> Upvote-->
-<!--                                </button>-->
-<!--                                <button type="submit" name="voteType" value="DOWNVOTE" class="btn btn-danger btn-sm">-->
-<!--                                    <i class="bi bi-arrow-down"></i> Downvote-->
-<!--                                </button>-->
-<!--                            </form>-->
-
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; Comments &ndash;&gt;-->
-<!--            <div class="card mt-4">-->
-<!--                <div class="card-header d-flex align-items-center">-->
-<!--                    <h4 class="mb-0"><i class="bi bi-chat"></i> Comments</h4>-->
-<!--                </div>-->
-<!--                <div class="card-body">-->
-<!--                    <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${commentDto}" method="post">-->
-<!--                        <div class="mb-3">-->
-<!--                            <textarea class="form-control" th:field="*{text}" placeholder="Write a comment..." required></textarea>-->
-<!--                        </div>-->
-<!--                        <button class="btn btn-primary" type="submit">Add Comment</button>-->
-<!--                    </form>-->
-<!--                    &lt;!&ndash; Comment List &ndash;&gt;-->
-<!--                    <div class="mt-4" th:replace="comment/fragments/comment-list :: commentList(comments=${comments})"></div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; Sidebar with trending communities or posts (optional) &ndash;&gt;-->
-<!--    </div>-->
-<!--</div>-->
 </body>
 </html>
