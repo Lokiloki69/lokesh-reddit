@@ -22,7 +22,7 @@ public class Post {
     @Column(nullable = false)
     private String title;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private String imageUrl;
@@ -35,7 +35,8 @@ public class Post {
     private Instant createdDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    //for making work by code just adding nullabe to true remove it later
+    @JoinColumn(name = "user_id",nullable = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,6 +48,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PostFile> files;
 
     @PrePersist
     public void prePersist() {

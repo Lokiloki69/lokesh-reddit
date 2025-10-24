@@ -3,17 +3,23 @@ package com.reddit.clone.service;
 import com.reddit.clone.dto.PostDto;
 import com.reddit.clone.entity.Community;
 import com.reddit.clone.entity.Post;
+//import com.reddit.clone.entity.PostDocument;
+import com.reddit.clone.entity.PostFile;
 import com.reddit.clone.exception.CommunityNotFoundException;
 import com.reddit.clone.exception.PostNotFoundException;
 import com.reddit.clone.mapper.PostMapper;
 import com.reddit.clone.repository.CommunityRepository;
 import com.reddit.clone.repository.PostRepository;
+//import com.reddit.clone.repository.PostSearchRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,21 +31,66 @@ public class PostService {
     private final PostRepository postRepository;
     private final CommunityRepository communityRepository;
     private final PostMapper postMapper;
+    private final CloudinaryService cloudinaryService;
+   // private final PostSearchRepository postSearchRepository;
     // private final AuthService authService; // Will be added later
 
-    public PostDto save(PostDto postDto) {
-        Community community = communityRepository.findByName(postDto.getCommunityName())
-                .orElseThrow(() -> new CommunityNotFoundException("Community not found: " + postDto.getCommunityName()));
+//    public PostDto save(PostDto postDto) {
+//        Community community = communityRepository.findByName(postDto.getCommunityName())
+//                .orElseThrow(() -> new CommunityNotFoundException("Community not found: " + postDto.getCommunityName()));
+//
+//        Post post = postMapper.mapDtoToEntity(postDto);
+//        post.setCommunity(community);
+//        // post.setUser(authService.getCurrentUser()); // Will be added later
+//
+//        Post savedPost = postRepository.save(post);
+//        log.info("Post created: {}", savedPost.getTitle());
+//
+//        return postMapper.mapEntityToDto(savedPost);
+//    }
+public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
+    System.out.println("inside savepostWithfiles method");
+    log.info("Saving post: {}", postDto);
+    Community community = communityRepository.findByName(postDto.getCommunityName())
+            .orElseThrow(() -> new CommunityNotFoundException("Community not found"));
 
-        Post post = postMapper.mapDtoToEntity(postDto);
-        post.setCommunity(community);
-        // post.setUser(authService.getCurrentUser()); // Will be added later
+    Post post = postMapper.mapDtoToEntity(postDto);
+    post.setCommunity(community);
+    System.out.println(post.getTitle());
+    System.out.println(post.getContent());
 
-        Post savedPost = postRepository.save(post);
-        log.info("Post created: {}", savedPost.getTitle());
+    List<PostFile> postFiles = new ArrayList<>();
 
-        return postMapper.mapEntityToDto(savedPost);
+    for (MultipartFile file : files) {
+        if (file != null && !file.isEmpty()) {
+            String url = cloudinaryService.uploadFile(file);
+            System.out.println("Uploaded file URL: " + url);
+            log.info("Uploaded file to Cloudinary: {}", url);
+
+            PostFile postFile = PostFile.builder()
+                    .fileName(file.getOriginalFilename())
+                    .fileType(file.getContentType())
+                    .fileUrl(url)
+                    .post(post)
+                    .build();
+
+            postFiles.add(postFile);
+        }
     }
+
+    post.setFiles(postFiles);
+
+    try {
+        Post saved = postRepository.save(post);
+        System.out.println("Saved post ID: " + saved.getId());
+        log.info("Saved post with id: {}", saved.getId());
+        return postMapper.mapEntityToDto(saved);
+    } catch (Exception e) {
+        log.error("Error saving post", e);
+        throw e;
+    }
+}
+
 
     @Transactional(readOnly = true)
     public PostDto getPostById(Long id) {
@@ -103,5 +154,13 @@ public class PostService {
         postRepository.deleteById(id);
         log.info("Post deleted with ID: {}", id);
     }
+//    public List<PostDocument> searchByTitleOrContent(String text) {
+//        return postSearchRepository.findByTitleContainingOrContentContaining(text, text);
+//    }
+
+    public Page<Post> searchPosts(String text, Pageable pageable) {
+        return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(text, text, pageable);
+    }
+
 }
 

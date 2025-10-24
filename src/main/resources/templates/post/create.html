@@ -14,19 +14,56 @@
                     <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Create Post</h3>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/posts/create}" th:object="${postDto}" method="post">
+<!--                    <form th:action="@{/posts/create}" th:object="${postDto}" method="post">-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="title" class="form-label">Title *</label>-->
+<!--                            <input type="text" class="form-control" th:field="*{title}" id="title" placeholder="Title">-->
+<!--                            <div th:if="${#fields.hasErrors('title')}" class="invalid-feedback" th:errors="*{title}"></div>-->
+<!--                        </div>-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="communityName" class="form-label">Community *</label>-->
+<!--                            <select class="form-select" th:field="*{communityName}" id="communityName" required>-->
+<!--                                <option th:each="community : ${communities}" th:value="${community.name}" th:text="${community.name}"></option>-->
+<!--                            </select>-->
+<!--                            <div th:if="${#fields.hasErrors('communityName')}" class="invalid-feedback" th:errors="*{communityName}"></div>-->
+<!--                        </div>-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="postType" class="form-label">Post Type</label>-->
+<!--                            <select class="form-select" th:field="*{postType}" id="postType">-->
+<!--                                <option value="TEXT">Text</option>-->
+<!--                                <option value="IMAGE">Image</option>-->
+<!--                                <option value="LINK">Link</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="content" class="form-label">Content</label>-->
+<!--                            <textarea class="form-control" th:field="*{content}" id="content" rows="5"></textarea>-->
+<!--                        </div>-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="imageUrl" class="form-label">Image URL</label>-->
+<!--                            <input type="text" class="form-control" th:field="*{imageUrl}" id="imageUrl">-->
+<!--                        </div>-->
+<!--                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">-->
+<!--                            <a th:href="@{/posts}" class="btn btn-secondary me-md-2">Cancel</a>-->
+<!--                            <button class="btn btn-primary"><i class="bi bi-check-circle"></i> Create Post</button>-->
+<!--                        </div>-->
+<!--                    </form>-->
+                    <form th:action="@{/posts/create}" th:object="${postDto}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title *</label>
-                            <input type="text" class="form-control" th:field="*{title}" id="title" placeholder="Title">
+                            <input type="text" class="form-control" th:field="*{title}" id="title" placeholder="Title"
+                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''">
                             <div th:if="${#fields.hasErrors('title')}" class="invalid-feedback" th:errors="*{title}"></div>
                         </div>
                         <div class="mb-3">
                             <label for="communityName" class="form-label">Community *</label>
-                            <select class="form-select" th:field="*{communityName}" id="communityName" required>
+                            <select class="form-select" th:field="*{communityName}" id="communityName"
+                                    th:classappend="${#fields.hasErrors('communityName')} ? 'is-invalid' : ''" required>
                                 <option th:each="community : ${communities}" th:value="${community.name}" th:text="${community.name}"></option>
                             </select>
                             <div th:if="${#fields.hasErrors('communityName')}" class="invalid-feedback" th:errors="*{communityName}"></div>
                         </div>
+                        <!-- Other fields unchanged -->
                         <div class="mb-3">
                             <label for="postType" class="form-label">Post Type</label>
                             <select class="form-select" th:field="*{postType}" id="postType">
@@ -40,14 +77,16 @@
                             <textarea class="form-control" th:field="*{content}" id="content" rows="5"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="imageUrl" class="form-label">Image URL</label>
-                            <input type="text" class="form-control" th:field="*{imageUrl}" id="imageUrl">
+                            <label for="files" class="form-label">Upload files (images, videos, gifs):</label>
+                            <input type="file" class="form-control" id="files" name="files" multiple accept="image/*,video/*,.gif" />
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a th:href="@{/posts}" class="btn btn-secondary me-md-2">Cancel</a>
                             <button class="btn btn-primary"><i class="bi bi-check-circle"></i> Create Post</button>
                         </div>
                     </form>
+
+
                 </div>
             </div>
         </div>

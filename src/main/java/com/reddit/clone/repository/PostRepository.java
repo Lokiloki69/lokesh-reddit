@@ -33,4 +33,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.community = :community ORDER BY p.voteCount DESC")
     Page<Post> findTopPostsByCommunity(@Param("community") Community community, Pageable pageable);
+
+    @Query("SELECT p FROM Post p WHERE p.title LIKE %:text% OR p.content LIKE %:text%")
+    Page<Post> searchByTitleOrContent(@Param("text") String text, Pageable pageable);
+
+    Page<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String title, String content, Pageable pageable);
+
+
 }
