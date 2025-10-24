@@ -136,6 +136,7 @@
 <!--</body>-->
 <!--</html>-->
 
+
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
@@ -158,6 +159,7 @@
                     </div>
                     <p class="card-text" th:text="${post.content}"></p>
 
+                    <!-- Display Media Files -->
                     <div th:if="${post.primaryMediaUrl != null}" class="mt-3 mb-3">
                         <div th:if="${post.primaryMediaType != null and post.primaryMediaType.startsWith('image')}">
                             <img th:src="${post.primaryMediaUrl}" class="img-fluid rounded" alt="Post Image" />
@@ -169,13 +171,16 @@
                             </video>
                         </div>
                     </div>
+
+                    <!-- Fallback to legacy imageUrl if no files -->
                     <div th:if="${post.primaryMediaUrl == null and post.imageUrl != null}">
                         <img th:src="${post.imageUrl}" class="img-fluid rounded" alt="Post Image" />
                     </div>
 
+                    <!-- Voting, Comments, Edit & Delete Section -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div class="d-flex align-items-center">
-
+                            <!-- Vote Buttons -->
                             <form th:action="@{/api/votes}" method="post" class="d-inline me-3">
                                 <input type="hidden" name="postId" th:value="${post.id}" />
 
@@ -188,12 +193,28 @@
                                 </button>
                             </form>
 
+                            <!-- Comment Count -->
                             <span class="text-muted">
                                 <i class="bi bi-chat"></i>
                                 <span th:text="${post.commentCount}"></span> Comments
                             </span>
                         </div>
 
+                        <!-- Edit and Delete Buttons (Right Side) -->
+                        <div class="d-flex align-items-center">
+                            <a th:href="@{'/posts/' + ${post.id} + '/edit'}"
+                               class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <form th:action="@{'/posts/' + ${post.id} + '/delete'}"
+                                  method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

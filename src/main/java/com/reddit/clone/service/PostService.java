@@ -1,6 +1,7 @@
 package com.reddit.clone.service;
 
 import com.reddit.clone.dto.PostDto;
+import com.reddit.clone.dto.PostFileDto;
 import com.reddit.clone.entity.Community;
 import com.reddit.clone.entity.Post;
 //import com.reddit.clone.entity.PostDocument;
@@ -20,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -142,6 +145,84 @@ public class PostService {
     public Page<Post> searchPosts(String text, Pageable pageable) {
         return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(text, text, pageable);
     }
+
+
+    // Add this method to get existing files
+    @Transactional(readOnly = true)
+    public List<PostFileDto> getPostFiles(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + postId));
+
+        if (post.getFiles() == null || post.getFiles().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return post.getFiles().stream()
+                .map(file -> PostFileDto.builder()
+                        .id(file.getId())
+                        .fileName(file.getFileName())
+                        .fileType(file.getFileType())
+                        .fileUrl(file.getFileUrl())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // Update this method to handle file uploads
+    public PostDto updatePostWithFiles(Long id, PostDto postDto, MultipartFile[] files, List<Long> deleteFileIds) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + id));
+
+        // Update basic fields
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        post.setPostType(postDto.getPostType());
+
+        // Update community if changed
+        if (postDto.getCommunityName() != null &&
+                !postDto.getCommunityName().equals(post.getCommunity().getName())) {
+            Community newCommunity = communityRepository.findByName(postDto.getCommunityName())
+                    .orElseThrow(() -> new CommunityNotFoundException(
+                            "Community not found: " + postDto.getCommunityName()));
+            post.setCommunity(newCommunity);
+        }
+
+        // Delete marked files
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
+            post.getFiles().removeIf(file -> {
+                if (deleteFileIds.contains(file.getId())) {
+                    // Optionally delete from Cloudinary
+                    // cloudinaryService.deleteFile(file.getFileUrl());
+                    log.info("Deleted file: {}", file.getFileName());
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        // Add new files
+        if (files != null && files.length > 0) {
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    String url = cloudinaryService.uploadFile(file);
+                    log.info("Uploaded new file to Cloudinary: {}", url);
+
+                    PostFile postFile = PostFile.builder()
+                            .fileName(file.getOriginalFilename())
+                            .fileType(file.getContentType())
+                            .fileUrl(url)
+                            .post(post)
+                            .build();
+
+                    post.getFiles().add(postFile);
+                }
+            }
+        }
+
+        Post updatedPost = postRepository.save(post);
+        log.info("Post updated: {}", updatedPost.getTitle());
+        return postMapper.mapEntityToDto(updatedPost);
+    }
+
 
 }
 

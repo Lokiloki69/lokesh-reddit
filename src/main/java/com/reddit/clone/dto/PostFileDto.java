@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PostFileDto {
+    private Long id;
     private String fileUrl;
     private String fileName;
     private String fileType;
