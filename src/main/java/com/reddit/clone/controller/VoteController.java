@@ -19,15 +19,13 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping
-    @ResponseBody
-    public ResponseEntity<String> vote(@Valid @RequestBody VoteDto voteDto) {
+    public String vote(@ModelAttribute @Valid VoteDto voteDto) {
         try {
             voteService.vote(voteDto);
-            return ResponseEntity.ok("Vote registered successfully");
+            return "redirect:/posts/" + voteDto.getPostId();
         } catch (Exception e) {
             log.error("Error processing vote", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to process vote: " + e.getMessage());
+            return "redirect:/posts/" + voteDto.getPostId() + "?error=" + e.getMessage();
         }
     }
 
