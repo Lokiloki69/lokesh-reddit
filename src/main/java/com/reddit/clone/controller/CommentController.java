@@ -26,25 +26,25 @@ public class CommentController {
             @RequestParam(required = false) Long parentCommentId,
             @Valid @ModelAttribute CommentDto commentDto,
             Model model) {
-            commentDto.setPostId(postId);
-            commentDto.setParentCommentId(parentCommentId);
-            Comment savedComment = commentService.save(commentDto);
-            model.addAttribute("comment", savedComment);
+        commentDto.setPostId(postId);
+        commentDto.setParentCommentId(parentCommentId);
+        Comment savedComment = commentService.save(commentDto);
+        model.addAttribute("comment", savedComment);
         return "redirect:/posts/" + postId;
     }
 
     @DeleteMapping("/deleteComment/{id}")
     public String deleteComment(@PathVariable Long id) {
-            Comment comment = commentService.getCommentById(id);
-            Long postId = comment.getPost().getId();
-            commentService.deleteComment(id);
-            return "redirect:/posts/" + postId;
-        }
+        Comment comment = commentService.getCommentById(id);
+        Long postId = comment.getPost().getId();
+        commentService.deleteComment(id);
+        return "redirect:/posts/" + postId;
+    }
 
     @PostMapping("/editComment/{id}")
     public String updateComment(@PathVariable Long id,@ModelAttribute CommentDto commentDto) {
-            Comment updatedComment = commentService.updateComment(id, commentDto);
-            return "redirect:/posts/" + updatedComment.getPost().getId();
+        Comment updatedComment = commentService.updateComment(id, commentDto);
+        return "redirect:/posts/" + updatedComment.getPost().getId();
     }
 
 
