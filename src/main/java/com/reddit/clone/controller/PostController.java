@@ -3,6 +3,7 @@ package com.reddit.clone.controller;
 import com.reddit.clone.dto.CommentDto;
 import com.reddit.clone.dto.PostDto;
 import com.reddit.clone.dto.VoteDto;
+import com.reddit.clone.entity.Post;
 import com.reddit.clone.service.CommentService;
 import com.reddit.clone.service.CommunityService;
 import com.reddit.clone.service.PostService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -74,28 +76,72 @@ public class PostController {
         return "post/create";
     }
 
-    @PostMapping("/create")
-    public String createPost(
-            @Valid @ModelAttribute PostDto postDto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+//    @PostMapping("/create")
+//    public String createPost(
+//            @Valid @ModelAttribute PostDto postDto,
+//            BindingResult result,
+//            Model model,
+//            RedirectAttributes redirectAttributes) {
+//
+//        if (result.hasErrors()) {
+//            model.addAttribute("communities", communityService.getAllCommunities());
+//            return "post/create";
+//        }
+//
+//        try {
+//            PostDto savedPost = postService.save(postDto);
+//            redirectAttributes.addFlashAttribute("success", "Post created successfully!");
+//            return "redirect:/posts/" + savedPost.getId();
+//        } catch (Exception e) {
+//            result.rejectValue("communityName", "error.postDto", e.getMessage());
+//            model.addAttribute("communities", communityService.getAllCommunities());
+//            return "post/create";
+//        }
+//    }
+@PostMapping("/create")
+public String createPost(
+        @Valid @ModelAttribute PostDto postDto,
+        BindingResult result,
+        @RequestParam(value = "files", required = false) MultipartFile[] files,
+        Model model,
+        RedirectAttributes redirectAttributes) {
+//    System.out.println(postDto.getTitle());
+//    System.out.println(postDto.getContent());
 
-        if (result.hasErrors()) {
-            model.addAttribute("communities", communityService.getAllCommunities());
-            return "post/create";
-        }
+//    if (result.hasErrors()) {
+//        System.out.println("error");
+//        model.addAttribute("communities", communityService.getAllCommunities());
+//        return "post/create";
+//    }
+        System.out.println(postDto.getTitle());
+    System.out.println(postDto.getContent());
+    if (result.hasErrors()) {
+        // --- ADD THIS LOGGING ---
+        System.err.println("--- VALIDATION ERROR DETECTED ---");
+        result.getAllErrors().forEach(error -> {
+            System.err.println("Field: " + (error.getCodes() != null ? error.getCodes()[0] : "N/A"));
+            System.err.println("Error Message: " + error.getDefaultMessage());
+        });
+        System.err.println("------------------------------------");
+        // ------------------------
 
-        try {
-            PostDto savedPost = postService.save(postDto);
-            redirectAttributes.addFlashAttribute("success", "Post created successfully!");
-            return "redirect:/posts/" + savedPost.getId();
-        } catch (Exception e) {
-            result.rejectValue("communityName", "error.postDto", e.getMessage());
-            model.addAttribute("communities", communityService.getAllCommunities());
-            return "post/create";
-        }
+        model.addAttribute("communities", communityService.getAllCommunities());
+        return "post/create";
     }
+
+    try {
+        if (files == null) {
+            files = new MultipartFile[0];  // avoid null pointer
+        }
+        PostDto savedPost = postService.savePostWithFiles(postDto, files);
+        redirectAttributes.addFlashAttribute("success", "Post created successfully!");
+        return "redirect:/posts/" + savedPost.getId();
+    } catch (Exception e) {
+        result.rejectValue("communityName", "error.postDto", e.getMessage());
+        model.addAttribute("communities", communityService.getAllCommunities());
+        return "post/create";
+    }
+}
 
     @GetMapping("/{id}")
     public String viewPost(@PathVariable Long id, Model model) {
@@ -111,7 +157,6 @@ public class PostController {
 
         return "post/view";
     }
-
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
@@ -159,5 +204,6 @@ public class PostController {
         }
         return "redirect:/posts";
     }
+
 }
 
