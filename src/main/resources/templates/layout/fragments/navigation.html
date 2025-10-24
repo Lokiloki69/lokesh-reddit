@@ -1,24 +1,99 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <div th:fragment="navigation">
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm py-1 px-2">
         <div class="container-fluid">
+            <!-- Logo -->
             <a class="navbar-brand d-flex align-items-center fw-bold" th:href="@{/}">
                 <img src="/images/reddit-logo.png" alt="Reddit" width="32" class="me-2"> Reddit
             </a>
-            <form class="mx-auto w-50 d-none d-lg-flex d-flex align-items-center" th:action="@{/search}" method="get">
-                <input class="form-control" type="search" placeholder="Search Reddit"
-                       aria-label="Search" name="query" style="width: 100%;">
-                <button type="submit" class="btn btn-link p-1 ms-2" aria-label="Search">
-                    <i class="bi bi-search" style="font-size: 1.25rem;"></i>
-                </button>
+
+            <!-- Search Bar -->
+            <form class="mx-auto w-50 d-none d-lg-flex">
+                <input class="form-control" type="search" placeholder="Search Reddit" aria-label="Search" style="width: 100%;">
             </form>
-            <div class="d-flex align-items-center ms-auto">
-                <a class="btn btn-primary me-2" th:href="@{/posts/create}">
-                    <i class="bi bi-plus-circle"></i> New Post
-                </a>
-                <!-- Optional: User dropdown, notification icons -->
+
+            <!-- Right Side Buttons -->
+            <div class="d-flex align-items-center ms-auto gap-2">
+
+                <!-- Show when NOT logged in -->
+                <div sec:authorize="!isAuthenticated()" class="d-flex gap-2">
+                    <a class="btn btn-outline-primary" th:href="@{/login}">
+                        <i class="bi bi-box-arrow-in-right"></i> Log In
+                    </a>
+                    <a class="btn btn-primary" th:href="@{/register}">
+                        <i class="bi bi-person-plus"></i> Sign Up
+                    </a>
+                </div>
+
+                <!-- Show when logged in -->
+<!--                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">-->
+<!--                    &lt;!&ndash; Create Post Button &ndash;&gt;-->
+<!--                    <a class="btn btn-primary" th:href="@{/posts/create}">-->
+<!--                        <i class="bi bi-plus-circle"></i> Create Post-->
+<!--                    </a>-->
+
+<!--                    &lt;!&ndash; User Dropdown &ndash;&gt;-->
+<!--                    <div class="dropdown">-->
+<!--                        <button class="btn btn-light dropdown-toggle d-flex align-items-center"-->
+<!--                                type="button"-->
+<!--                                id="userDropdown"-->
+<!--                                data-bs-toggle="dropdown"-->
+<!--                                aria-expanded="false">-->
+<!--                            <img src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"-->
+<!--                                 alt="Avatar"-->
+<!--                                 class="rounded-circle me-2"-->
+<!--                                 width="32"-->
+<!--                                 height="32">-->
+<!--                            <span sec:authentication="name">Username</span>-->
+<!--                        </button>-->
+<!--                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">-->
+<!--                            <li>-->
+<!--                                <a class="dropdown-item" th:href="@{'/user/' + ${#authentication.name}}">-->
+<!--                                    <i class="bi bi-person"></i> My Profile-->
+<!--                                </a>-->
+<!--                            </li>-->
+<!--                            <li>-->
+<!--                                <a class="dropdown-item" th:href="@{/user/settings}">-->
+<!--                                    <i class="bi bi-gear"></i> Settings-->
+<!--                                </a>-->
+<!--                            </li>-->
+<!--                            <li><hr class="dropdown-divider"></li>-->
+<!--                            <li>-->
+<!--                                <form th:action="@{/logout}" method="post" class="d-inline">-->
+<!--                                    <button type="submit" class="dropdown-item text-danger">-->
+<!--                                        <i class="bi bi-box-arrow-right"></i> Log Out-->
+<!--                                    </button>-->
+<!--                                </form>-->
+<!--                            </li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                    <!-- Create Post Button -->
+                    <a class="btn btn-primary" th:href="@{/posts/create}">
+                        <i class="bi bi-plus-circle"></i> Create Post
+                    </a>
+
+                    <!-- User Profile Button -->
+                    <a class="btn btn-outline-secondary d-flex align-items-center"
+                       th:href="@{'/user/' + ${#authentication.name}}">
+                        <img src="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"
+                             alt="Avatar"
+                             class="rounded-circle me-2"
+                             width="32"
+                             height="32">
+                        <span sec:authentication="name">Username</span>
+                    </a>
+
+                    <!-- Logout Button -->
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger">Log Out</button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </nav>

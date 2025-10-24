@@ -30,7 +30,7 @@ public class User {
 
     private Instant createdDate;
 
-    private Boolean enabled = false;
+    private Boolean enabled = true;
 
     @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
     private List<Community> createdCommunities;
