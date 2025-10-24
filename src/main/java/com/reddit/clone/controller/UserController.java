@@ -33,7 +33,8 @@ public class UserController {
         log.debug("User Data is {}", user);
         User newUser = userService.register(user);
         log.debug("It is in the Post Mapping {}", newUser);
-        return "redirect:/user/" + newUser.getUsername();
+//        return "redirect:/user/" + newUser.getUsername();
+        return "redirect:/login";
     }
 
     @GetMapping("/user/{username}")
@@ -50,12 +51,9 @@ public class UserController {
     public String viewUserPosts(@PathVariable String username, Model model) {
         UserViewDto userView = userService.getUserView(username);
 
-        log.debug("In the post View {}", userView);
-
         model.addAttribute("userView", userView);
         model.addAttribute("activeTab", "posts");
 
-//        return "test";
         return "user/view";
     }
 

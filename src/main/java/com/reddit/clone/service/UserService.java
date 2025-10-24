@@ -2,13 +2,10 @@ package com.reddit.clone.service;
 
 import com.reddit.clone.dto.UserViewDto;
 import com.reddit.clone.entity.User;
-import com.reddit.clone.entity.UserProfile;
 import com.reddit.clone.exception.RedditCloneException;
 import com.reddit.clone.mapper.UserMapper;
-import com.reddit.clone.repository.UserProfileRepository;
 import com.reddit.clone.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -44,14 +41,15 @@ public class UserService {
         return sb.toString();
     }
 
+    // Let's Keep it simple '
+    //
 
-
-    private final UserProfileRepository userProfileRepository;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserProfileRepository userProfileRepository, UserMapper userMapper, UserRepository repo) {
-        this.userProfileRepository = userProfileRepository;
+    public UserService(UserMapper userMapper, UserRepository repo, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.userRepository = repo;
     }
@@ -60,6 +58,10 @@ public class UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already in use");
         }
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
         String generatedUsername = generateUniqueUsername();
         user.setUsername(generatedUsername);
 
@@ -73,6 +75,5 @@ public class UserService {
 
         return userMapper.mapToUserView(user);
     }
-
 
 }
