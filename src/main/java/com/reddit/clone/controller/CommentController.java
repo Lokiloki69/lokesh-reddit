@@ -1,6 +1,8 @@
 package com.reddit.clone.controller;
 
 import com.reddit.clone.dto.CommentDto;
+import com.reddit.clone.entity.Comment;
+import com.reddit.clone.mapper.CommentMapper;
 import com.reddit.clone.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -22,26 +25,13 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public String createComment(
             @PathVariable Long postId,
+            @RequestParam(required = false) Long parentCommentId,
             @Valid @ModelAttribute CommentDto commentDto,
-            BindingResult result,
-            RedirectAttributes redirectAttributes) {
-
-        if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Failed to add comment: " + result.getAllErrors().get(0).getDefaultMessage());
-            return "redirect:/posts/" + postId;
-        }
-
-        try {
+            Model model) {
             commentDto.setPostId(postId);
-            commentService.save(commentDto);
-            redirectAttributes.addFlashAttribute("success", "Comment added successfully!");
-        } catch (Exception e) {
-            log.error("Error creating comment", e);
-            redirectAttributes.addFlashAttribute("error",
-                    "Failed to add comment: " + e.getMessage());
-        }
-
+            commentDto.setParentCommentId(parentCommentId);
+            Comment savedComment = commentService.save(commentDto);
+            model.addAttribute("comment", savedComment);
         return "redirect:/posts/" + postId;
     }
 

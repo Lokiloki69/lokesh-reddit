@@ -198,27 +198,97 @@
                 </div>
             </div>
 
-            <div class="card mt-4">
-                <div class="card-header d-flex align-items-center">
-                    <h4 class="mb-0"><i class="bi bi-chat"></i> Comments</h4>
-                </div>
-                <div class="card-body">
-                    <form th:action="@{'/posts/' + ${post.id} + '/comments'}" th:object="${commentDto}" method="post">
-                        <div class="mb-3">
-                            <textarea class="form-control" th:field="*{text}"
-                                      placeholder="Write a comment..." rows="3" required></textarea>
-                        </div>
-                        <button class="btn btn-primary" type="submit">
-                            <i class="bi bi-send"></i> Add Comment
-                        </button>
-                    </form>
+            <!--            remove this later-->
 
-                    <div class="mt-4" th:if="${comments != null and !comments.isEmpty()}">
-                        <div th:replace="comment/fragments/comment-list :: commentList(comments=${comments})"></div>
+            <div class="card-body">
+                <!-- Form to add a top-level comment -->
+                <form th:action="@{/posts/{id}/comments(id=${post.id})}" th:object="${commentDto}" method="post" class="mb-4">
+                    <div class="mb-3">
+                        <textarea class="form-control" th:field="*{text}" placeholder="Write a comment..." rows="3" required></textarea>
                     </div>
-                    <div class="mt-4 text-center text-muted" th:if="${comments == null or comments.isEmpty()}">
-                        <p>No comments yet. Be the first to comment!</p>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-send"></i> Add Comment
+                    </button>
+                </form>
+
+                <!-- Recursive Comment Fragment -->
+                <div th:fragment="commentThread(commentList, level)">
+                    <div th:each="comment : ${commentList}" class="mb-3">
+                        <!-- Comment Card with dynamic indentation -->
+                        <div class="card shadow-sm">
+                            <div class="card-body" th:classappend="${level > 0} ? 'py-2' : ''">
+                                <!-- Comment Header -->
+                                <div class="d-flex align-items-center mb-2">
+                                    <div th:classappend="${level == 0} ? 'bg-primary' : 'bg-secondary'"
+                                         class="text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                         th:style="${level == 0} ? 'width: 40px; height: 40px; font-weight: bold;' : 'width: 32px; height: 32px; font-size: 0.85rem; font-weight: bold;'">
+                                        <span th:text="${#strings.substring(comment.user.username, 0, 1).toUpperCase()}">U</span>
+                                    </div>
+                                    <div>
+                                        <strong th:classappend="${level > 0} ? 'small' : ''" th:text="${comment.user.username}">Username</strong>
+                                        <small class="text-muted d-block"
+                                               th:style="${level > 0} ? 'font-size: 0.75rem;' : ''"
+                                               th:text="${comment.createdDate}">Date</small>
+                                    </div>
+                                </div>
+
+                                <!-- Comment Text -->
+                                <p class="mb-3"
+                                   th:classappend="${level > 0} ? 'ms-5' : ''"
+                                   th:text="${comment.text}">Comment content here</p>
+
+                                <!-- Action Buttons -->
+                                <div th:classappend="${level > 0} ? 'ms-5' : ''">
+                                    <!-- Reply Button -->
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            th:classappend="${level > 0} ? 'btn-outline-secondary' : ''"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            th:attr="data-bs-target='#replyForm-' + ${comment.id}">
+                                        <i class="bi bi-reply"></i> Reply
+                                    </button>
+
+                                    <!-- Show Replies Button (only if replies exist) -->
+                                    <button th:if="${comment.replies != null and #lists.size(comment.replies) > 0}"
+                                            class="btn btn-sm btn-link text-decoration-none ms-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            th:attr="data-bs-target='#replies-' + ${comment.id}">
+                                        <i class="bi bi-chevron-down"></i>
+                                        <span th:text="${#lists.size(comment.replies)} + ' replies'">0 replies</span>
+                                    </button>
+                                </div>
+
+                                <!-- Reply Form (Collapsed by default) -->
+                                <div class="collapse mt-3"
+                                     th:classappend="${level > 0} ? 'ms-5' : ''"
+                                     th:id="'replyForm-' + ${comment.id}">
+                                    <form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
+                                        <input type="hidden" name="parentCommentId" th:value="${comment.id}" />
+                                        <textarea name="text" placeholder="Write a reply..." class="form-control mb-2" rows="2" required></textarea>
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-send"></i> Submit Reply
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Recursively render nested comments (Collapsed by default) -->
+                            <div th:if="${comment.replies != null and #lists.size(comment.replies) > 0}"
+                                 class="collapse ps-4 pe-3 pb-3"
+                                 th:id="'replies-' + ${comment.id}">
+                                <div th:replace="~{:: commentThread(${comment.replies}, ${level + 1})}"></div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Render top-level comments using the fragment -->
+                <div th:replace="~{:: commentThread(${comments.?[parentComment == null]}, 0)}"></div>
+
+                <!-- No comments message -->
+                <div th:if="${#lists.isEmpty(comments)}" class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No comments yet. Be the first to comment!
                 </div>
             </div>
         </div>

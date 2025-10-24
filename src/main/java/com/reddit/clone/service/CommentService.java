@@ -14,7 +14,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,46 +31,63 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentMapper commentMapper;
 
-    public CommentDto save(CommentDto commentDto) {
-        Post post = postRepository.findById(commentDto.getPostId())
+    public Comment save(CommentDto givenComment) {
+        Post post = postRepository.findById(givenComment.getPostId())
                 .orElseThrow(() -> new PostNotFoundException(
-                        "Post not found with ID: " + commentDto.getPostId()));
+                        "Post not found with ID: " + givenComment.getPostId()));
 
         // For now, create a default user until authentication is implemented
         User user = getOrCreateDefaultUser();
 
-        Comment comment = commentMapper.mapDtoToEntity(commentDto);
+        Comment comment = new Comment();
+        comment.setText(givenComment.getText());
         comment.setPost(post);
         comment.setUser(user);
+
+        Optional<Comment> parentComment = Optional.empty();
+        if (givenComment.getParentCommentId() != null) {
+            parentComment = commentRepository.findById(givenComment.getParentCommentId());
+        }
+
+        if (parentComment.isPresent()) {
+            comment.setParentComment(parentComment.get());
+        } else {
+            comment.setParentComment(null);
+        }
 
         Comment savedComment = commentRepository.save(comment);
         log.info("Comment created on post: {}", post.getTitle());
 
-        return commentMapper.mapEntityToDto(savedComment);
+        if (parentComment.isPresent()) {
+            List<Comment> replies = parentComment.get().getReplies();
+            if (replies == null) replies = new ArrayList<>();
+            replies.add(savedComment);
+            parentComment.get().setReplies(replies);
+        }
+
+        return savedComment;
+    }
+
+    public List<Comment> getCommentsByParentCommentId(Long id){
+        return commentRepository.findByParentCommentId(id);
     }
 
     @Transactional(readOnly = true)
-    public List<CommentDto> getCommentsByPost(Long postId) {
+    public List<Comment> getCommentsByPost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(
                         "Post not found with ID: " + postId));
 
-        return commentRepository.findByPostOrderByCreatedDateAsc(post)
-                .stream()
-                .map(commentMapper::mapEntityToDto)
-                .collect(Collectors.toList());
+        return new ArrayList<>(commentRepository.findByPostOrderByCreatedDateAsc(post));
     }
 
     @Transactional(readOnly = true)
-    public List<CommentDto> getCommentsByUser(String username) {
+    public List<Comment> getCommentsByUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RedditCloneException(
                         "User not found: " + username));
 
-        return commentRepository.findByUser(user)
-                .stream()
-                .map(commentMapper::mapEntityToDto)
-                .collect(Collectors.toList());
+        return commentRepository.findByUser(user);
     }
 
     @Transactional(readOnly = true)
@@ -99,5 +119,15 @@ public class CommentService {
                             .build();
                     return userRepository.save(newUser);
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public List<Comment> getChildCommentsRecursive(Long id) {
+        List<Comment> children = commentRepository.findByParentCommentId(id);
+        for (Comment child : children) {
+            List<Comment> subReplies = getChildCommentsRecursive(child.getId());
+            child.setReplies(subReplies);
+        }
+        return children;
     }
 }

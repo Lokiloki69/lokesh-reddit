@@ -21,4 +21,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT c FROM Comment c WHERE c.post = :post ORDER BY c.createdDate ASC")
     List<Comment> findByPostOrderByCreatedDateAsc(@Param("post") Post post);
+
+    List<Comment> findByParentCommentId(Long parentCommentId);
 }
