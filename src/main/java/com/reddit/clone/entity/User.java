@@ -22,8 +22,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    private String displayname;
-
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -43,8 +41,11 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-//    private List<Vote> votes;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Vote> votes;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserProfile profile;
 
     @PrePersist
     public void prePersist() {
