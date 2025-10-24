@@ -1,6 +1,7 @@
 package com.reddit.clone.controller;
 
 import com.reddit.clone.dto.UserDto;
+import com.reddit.clone.dto.UserViewDto;
 import com.reddit.clone.entity.User;
 import com.reddit.clone.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -29,8 +31,42 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, Model model) {
         log.debug("User Data is {}", user);
-        userService.register(user);
-        return "test";
+        User newUser = userService.register(user);
+        log.debug("It is in the Post Mapping {}", newUser);
+        return "redirect:/user/" + newUser.getUsername();
+    }
+
+    @GetMapping("/user/{username}")
+    public String viewUserProfile(@PathVariable String username, Model model) {
+        UserViewDto userView = userService.getUserView(username);
+
+        model.addAttribute("userView", userView);
+        model.addAttribute("activeTab", "overview");
+
+        return "user/view";
+    }
+
+    @GetMapping("/user/{username}/posts")
+    public String viewUserPosts(@PathVariable String username, Model model) {
+        UserViewDto userView = userService.getUserView(username);
+
+        log.debug("In the post View {}", userView);
+
+        model.addAttribute("userView", userView);
+        model.addAttribute("activeTab", "posts");
+
+//        return "test";
+        return "user/view";
+    }
+
+    @GetMapping("/user/{username}/comments")
+    public String viewUserComments(@PathVariable String username, Model model) {
+        UserViewDto userView = userService.getUserView(username);
+
+        model.addAttribute("userView", userView);
+        model.addAttribute("activeTab", "comments");
+
+        return "user/view";
     }
 }
 

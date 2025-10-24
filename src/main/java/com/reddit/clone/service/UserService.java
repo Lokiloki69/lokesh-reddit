@@ -1,7 +1,14 @@
 package com.reddit.clone.service;
 
+import com.reddit.clone.dto.UserViewDto;
 import com.reddit.clone.entity.User;
+import com.reddit.clone.entity.UserProfile;
+import com.reddit.clone.exception.RedditCloneException;
+import com.reddit.clone.mapper.UserMapper;
+import com.reddit.clone.repository.UserProfileRepository;
 import com.reddit.clone.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -16,9 +23,36 @@ public class UserService {
     private static final int RANDOM_LENGTH = 6;
     private final SecureRandom random = new SecureRandom();
 
+    public String generateUniqueUsername() {
+        String username;
+        int attempts = 0;
+        do {
+            username = BASE_NAME + generateRandomString();
+            if (attempts > 10) {
+                throw new RuntimeException("Failed to generate unique username");
+            }
+        } while (userRepository.existsByUsername(username));
+        return username;
+    }
+
+    private String generateRandomString() {
+        StringBuilder sb = new StringBuilder(UserService.RANDOM_LENGTH);
+        for (int i = 0; i < UserService.RANDOM_LENGTH; i++) {
+            int index = random.nextInt(ALPHANUM.length());
+            sb.append(ALPHANUM.charAt(index));
+        }
+        return sb.toString();
+    }
+
+
+
+    private final UserProfileRepository userProfileRepository;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
-    public UserService(UserRepository repo) {
+    public UserService(UserProfileRepository userProfileRepository, UserMapper userMapper, UserRepository repo) {
+        this.userProfileRepository = userProfileRepository;
+        this.userMapper = userMapper;
         this.userRepository = repo;
     }
 
@@ -33,21 +67,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String generateUniqueUsername() {
-        String username;
-        do {
-            username = BASE_NAME + generateRandomString();
-        } while (userRepository.existsByUsername(username));
-        return username;
+    public UserViewDto getUserView(String username) {
+        User user = userRepository.findByUsernameWithProfile(username)
+                .orElseThrow(() -> new RedditCloneException("User not found: " + username));
+
+        return userMapper.mapToUserView(user);
     }
 
-    private String generateRandomString() {
-        StringBuilder sb = new StringBuilder(UserService.RANDOM_LENGTH);
-        for (int i = 0; i < UserService.RANDOM_LENGTH; i++) {
-            int index = random.nextInt(ALPHANUM.length());
-            sb.append(ALPHANUM.charAt(index));
-        }
-        return sb.toString();
-    }
 
 }
