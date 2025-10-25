@@ -99,10 +99,9 @@ public class PostDto {
 
     private Integer commentCount;
 
-    private String voteStatus; // UPVOTE, DOWNVOTE, or null
+    private String voteStatus;
 
-    // --- NEW FIELDS FOR HOMEPAGE DISPLAY ---
     private String primaryMediaUrl;
+
     private String primaryMediaType;
-    // private transient List<PostFileDto> files; // Keep this commented/removed
 }

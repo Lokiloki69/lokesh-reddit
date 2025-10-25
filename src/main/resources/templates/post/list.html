@@ -1,60 +1,4 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en"-->
-<!--      xmlns:th="http://www.thymeleaf.org"-->
-<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
-<!--      layout:decorate="~{layout/base}">-->
 
-<!--<head><title>Posts</title></head>-->
-<!--<body>-->
-<!--<div layout:fragment="content">-->
-<!--    <div class="d-flex justify-content-between align-items-center mb-4">-->
-<!--        <h2><i class="bi bi-collection"></i> Posts</h2>-->
-<!--        <a th:href="@{/posts/create}" class="btn btn-primary">-->
-<!--            <i class="bi bi-plus-circle"></i> Create Post-->
-<!--        </a>-->
-<!--    </div>-->
-<!--    &lt;!&ndash; Loop posts &ndash;&gt;-->
-<!--    <div th:fragment="posts(posts)">-->
-<!--        <div th:if="${posts.content.size() > 0}">-->
-<!--            <div class="list-group">-->
-<!--                <div th:each="post : ${posts.content}" class="list-group-item list-group-item-action py-3">-->
-<!--                    <a th:href="@{'/posts/' + ${post.id}}" class="fw-bold text-decoration-none fs-5" th:text="${post.title}"></a>-->
-<!--                    <div class="text-muted small">-->
-<!--                        r/<span th:text="${post.communityName}"></span> &bullet;-->
-<!--                        Posted by <span th:text="${post.username}"></span> &bullet;-->
-<!--                        <span th:text="${#temporals.format(post.createdDate, 'MMM dd, yyyy')}"></span>-->
-<!--                    </div>-->
-<!--                    <div>-->
-<!--                        <span th:if="${post.voteCount > 0}" class="badge bg-success me-2">+<span th:text="${post.voteCount}"></span></span>-->
-<!--                        <span th:if="${post.voteCount < 0}" class="badge bg-danger me-2"><span th:text="${post.voteCount}"></span></span>-->
-<!--                        <span th:if="${post.voteCount == 0}" class="badge bg-secondary me-2">0</span>-->
-<!--                        <span class="text-muted small"><i class="bi bi-chat"></i> <span th:text="${post.commentCount}"></span> Comments</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div th:if="${posts.content.size() == 0}" class="text-center py-5">-->
-<!--            <i class="bi bi-inbox display-1 text-muted"></i>-->
-<!--            <h3 class="text-muted mt-3">No posts found</h3>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; Pagination &ndash;&gt;-->
-<!--        <nav th:if="${posts.totalPages > 1}" aria-label="Posts pagination">-->
-<!--            <ul class="pagination justify-content-center">-->
-<!--                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">-->
-<!--                    <a class="page-link" th:href="@{/posts(page=${currentPage - 1}, sort=${sort})}">Previous</a>-->
-<!--                </li>-->
-<!--                <li th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}" class="page-item" th:classappend="${i == currentPage} ? 'active'">-->
-<!--                    <a class="page-link" th:href="@{/posts(page=${i}, sort=${sort})}" th:text="${i + 1}"></a>-->
-<!--                </li>-->
-<!--                <li class="page-item" th:classappend="${currentPage == posts.totalPages - 1} ? 'disabled'">-->
-<!--                    <a class="page-link" th:href="@{/posts(page=${currentPage + 1}, sort=${sort})}">Next</a>-->
-<!--                </li>-->
-<!--            </ul>-->
-<!--        </nav>-->
-<!--    </div>-->
-<!--</div>-->
-<!--</body>-->
-<!--</html>-->
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
@@ -109,18 +53,41 @@
             <h3 class="text-muted mt-3">No posts found</h3>
         </div>
         <nav th:if="${posts.totalPages > 1}" aria-label="Posts pagination">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a class="page-link" th:href="@{/posts(page=${currentPage - 1}, sort=${sort})}">Previous</a>
+            <ul class="pagination justify-content-center mt-4"
+                style="gap: 6px; border: none; background: transparent;">
+
+                <!-- Previous Button -->
+                <li class="page-item"
+                    th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/home(page=${currentPage - 1}, size=${posts.size}, sort=${sort})}"
+                       style="border-radius: 8px; color: #0d6efd; font-weight: 500; border: 1px solid #dee2e6;">
+                        &laquo; Previous
+                    </a>
                 </li>
-                <li th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}" class="page-item" th:classappend="${i == currentPage} ? 'active'">
-                    <a class="page-link" th:href="@{/posts(page=${i}, sort=${sort})}" th:text="${i + 1}"></a>
+
+                <!-- Page Numbers -->
+                <li th:each="i : ${#numbers.sequence(0, posts.totalPages - 1)}"
+                    class="page-item"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/home(page=${i}, size=${posts.size}, sort=${sort})}"
+                       th:text="${i + 1}"
+                       style="border-radius: 8px; font-weight: 500; border: 1px solid #dee2e6;"></a>
                 </li>
-                <li class="page-item" th:classappend="${currentPage == posts.totalPages - 1} ? 'disabled'">
-                    <a class="page-link" th:href="@{/posts(page=${currentPage + 1}, sort=${sort})}">Next</a>
+
+                <!-- Next Button -->
+                <li class="page-item"
+                    th:classappend="${currentPage == posts.totalPages - 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/home(page=${currentPage + 1}, size=${posts.size}, sort=${sort})}"
+                       style="border-radius: 8px; color: #0d6efd; font-weight: 500; border: 1px solid #dee2e6;">
+                        Next &raquo;
+                    </a>
                 </li>
             </ul>
         </nav>
+
     </div>
 </div>
 </body>

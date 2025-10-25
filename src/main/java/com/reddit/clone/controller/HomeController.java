@@ -24,10 +24,11 @@ public class HomeController {
     private final CommunityService communityService;
     private final PostMapper postMapper;
 
-    @GetMapping("/")
+//    @GetMapping("/")
+@GetMapping({"/", "/home"})
     public String home(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "3") int size,
             @RequestParam(defaultValue = "hot") String sort,
             Model model) {
 
@@ -35,6 +36,7 @@ public class HomeController {
         var posts = sort.equals("new") ?
                 postService.getNewPosts(pageable) :
                 postService.getHotPosts(pageable);
+    System.out.println("HomeController: Retrieved " + posts.getNumberOfElements() + " posts for page " + page + " sorted by " + sort);
 
         var communities = communityService.getAllCommunities(PageRequest.of(0, 5));
 
