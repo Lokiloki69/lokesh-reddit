@@ -41,15 +41,12 @@ public class PostService {
     // private final AuthService authService; // Will be added later
 
     public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
-        System.out.println("inside savepostWithfiles method");
         log.info("Saving post: {}", postDto);
         Community community = communityRepository.findByName(postDto.getCommunityName())
                 .orElseThrow(() -> new CommunityNotFoundException("Community not found"));
 
         Post post = postMapper.mapDtoToEntity(postDto);
         post.setCommunity(community);
-        System.out.println(post.getTitle());
-        System.out.println(post.getContent());
 
         List<PostFile> postFiles = new ArrayList<>();
 

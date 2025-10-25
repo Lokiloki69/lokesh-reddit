@@ -77,43 +77,37 @@ public class PostController {
         return "post/create";
     }
 
-@PostMapping("/create")
-public String createPost(
-        @Valid @ModelAttribute PostDto postDto,
-        BindingResult result,
-        @RequestParam(value = "files", required = false) MultipartFile[] files,
-        Model model,
-        RedirectAttributes redirectAttributes) {
+    @PostMapping("/create")
+    public String createPost(
+            @Valid @ModelAttribute PostDto postDto,
+            BindingResult result,
+            @RequestParam(value = "files", required = false) MultipartFile[] files,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
-        System.out.println(postDto.getTitle());
-    System.out.println(postDto.getContent());
-    if (result.hasErrors()) {
-        // --- ADD THIS LOGGING ---
-        System.err.println("--- VALIDATION ERROR DETECTED ---");
-        result.getAllErrors().forEach(error -> {
-            System.err.println("Field: " + (error.getCodes() != null ? error.getCodes()[0] : "N/A"));
-            System.err.println("Error Message: " + error.getDefaultMessage());
-        });
-        System.err.println("------------------------------------");
-        // ------------------------
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(error -> {
+                System.err.println("Field: " + (error.getCodes() != null ? error.getCodes()[0] : "N/A"));
+                System.err.println("Error Message: " + error.getDefaultMessage());
+            });
 
-        model.addAttribute("communities", communityService.getAllCommunities());
-        return "post/create";
-    }
-
-    try {
-        if (files == null) {
-            files = new MultipartFile[0];  // avoid null pointer
+            model.addAttribute("communities", communityService.getAllCommunities());
+            return "post/create";
         }
-        PostDto savedPost = postService.savePostWithFiles(postDto, files);
-        redirectAttributes.addFlashAttribute("success", "Post created successfully!");
-        return "redirect:/posts/" + savedPost.getId();
-    } catch (Exception e) {
-        result.rejectValue("communityName", "error.postDto", e.getMessage());
-        model.addAttribute("communities", communityService.getAllCommunities());
-        return "post/create";
+
+        try {
+            if (files == null) {
+                files = new MultipartFile[0];  // avoid null pointer
+            }
+            PostDto savedPost = postService.savePostWithFiles(postDto, files);
+            redirectAttributes.addFlashAttribute("success", "Post created successfully!");
+            return "redirect:/posts/" + savedPost.getId();
+        } catch (Exception e) {
+            result.rejectValue("communityName", "error.postDto", e.getMessage());
+            model.addAttribute("communities", communityService.getAllCommunities());
+            return "post/create";
+        }
     }
-}
 
     @GetMapping("/{id}")
     public String viewPost(@PathVariable Long id, Model model) {
