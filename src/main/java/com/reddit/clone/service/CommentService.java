@@ -130,4 +130,16 @@ public class CommentService {
         }
         return children;
     }
+
+    public Comment getCommentById(Long id){
+        return commentRepository.findById(id).orElseThrow(()->
+                new RuntimeException("Comment not found!"));
+    }
+
+    public Comment updateComment(Long id, CommentDto commentDto) {
+        Comment comment = commentRepository.findById(id).
+                orElseThrow(()-> new RuntimeException("Comment not found"));
+        comment.setText(commentDto.getText());
+        return commentRepository.save(comment);
+    }
 }
