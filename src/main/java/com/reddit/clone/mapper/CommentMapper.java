@@ -20,7 +20,18 @@ public class CommentMapper {
                 .build();
     }
 
-    public List<CommentDto> mapEntityToDto (List<Comment> comments) {
+    public CommentDto mapEntityToDto(Comment comment) {
+        return CommentDto.builder()
+                .id(comment.getId())
+                .text(comment.getText())
+                .userId(comment.getUser().getId())
+                .postId(comment.getPost().getId())
+                .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
+                .createdDate(comment.getCreatedDate())
+                .build();
+    }
+
+    public List<CommentDto> mapEntityToDto(List<Comment> comments) {
         if (comments == null || comments.isEmpty()) return List.of();
         return comments.stream()
                 .map(this::mapEntityToDto)
