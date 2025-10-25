@@ -14,19 +14,15 @@ import java.time.Instant;
 @Builder
 public class CommentDto {
 
-    private Long id;
-
     @NotBlank(message = "Comment text is required")
     @Size(min = 1, max = 1000, message = "Comment must be between 1 and 1000 characters")
     private String text;
 
-    private Instant createdDate;
-
     private Long postId;
 
-    private String postTitle;
-
-    private String username;
-
     private Long userId;
+
+    private Long parentCommentId;
+
+    private Instant createdDate;
 }

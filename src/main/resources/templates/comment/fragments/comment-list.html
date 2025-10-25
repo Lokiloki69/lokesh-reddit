@@ -4,7 +4,7 @@
 <div th:fragment="commentList(comments)">
     <ul class="list-group">
         <li th:each="comment : ${comments}" class="list-group-item">
-            <div class="fw-bold" th:text="${comment.username}"></div>
+            <div class="fw-bold" th:text="${comment.user.username}"></div>
             <div th:text="${comment.text}"></div>
             <small class="text-muted" th:text="${#temporals.format(comment.createdDate, 'MMM dd, yyyy, HH:mm')}"></small>
         </li>

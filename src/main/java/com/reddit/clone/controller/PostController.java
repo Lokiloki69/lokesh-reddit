@@ -4,6 +4,7 @@ import com.reddit.clone.dto.CommentDto;
 import com.reddit.clone.dto.PostDto;
 import com.reddit.clone.dto.VoteDto;
 import com.reddit.clone.entity.Post;
+import com.reddit.clone.entity.Comment;
 import com.reddit.clone.service.CommentService;
 import com.reddit.clone.service.CommunityService;
 import com.reddit.clone.service.PostService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -146,8 +148,11 @@ public String createPost(
     @GetMapping("/{id}")
     public String viewPost(@PathVariable Long id, Model model) {
         PostDto post = postService.getPostById(id);
-        List<CommentDto> comments = commentService.getCommentsByPost(id);
-
+        List<Comment> comments = commentService.getCommentsByPost(id);
+        for (Comment comment : comments) {
+            List<Comment> replies = commentService.getChildCommentsRecursive(comment.getId());
+            comment.setReplies(replies);
+        }
         model.addAttribute("post", post);
         model.addAttribute("comments", comments);
         model.addAttribute("commentDto", new CommentDto());
@@ -158,6 +163,7 @@ public String createPost(
 
         return "post/view";
     }
+
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
