@@ -23,6 +23,8 @@
                         r/<span th:text="${post.communityName}"></span> &bullet;
                         Posted by <span th:text="${post.username}"></span> &bullet;
                         <span th:text="${#temporals.format(post.createdDate, 'MMM dd, yyyy')}"></span>
+<!--                        displaying the timestamp on the list of posts-->
+                        <small th:text="${@timeAgoUtil.toTimeAgo(post.createdDate)}"></small>
                     </div>
 
                     <div th:if="${post.primaryMediaUrl != null}" class="mt-2 mb-2">

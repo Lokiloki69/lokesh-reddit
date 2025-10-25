@@ -9,20 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentMapper {
 
-//    public CommentDto mapEntityToDto(Comment comment) {
-//        return CommentDto.builder()
-//                .id(comment.getId())
-//                .text(comment.getText())
-//                .createdDate(comment.getCreatedDate())
-//                .postId(comment.getPost() != null ?
-//                        comment.getPost().getId() : null)
-//                .userId(comment.getUser() != null ?
-//                        comment.getUser().getId() : null)
-//                .parentCommentId(comment.getParentComment() != null ?
-//                        comment.getParentComment().getId() : null)
-//                .build();
-//    }
-
     public Comment mapDtoToEntity(CommentDto commentDto, Post post, User user, Comment parentComment) {
         return Comment.builder()
                 .text(commentDto.getText())

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -78,28 +77,6 @@ public class PostController {
         return "post/create";
     }
 
-//    @PostMapping("/create")
-//    public String createPost(
-//            @Valid @ModelAttribute PostDto postDto,
-//            BindingResult result,
-//            Model model,
-//            RedirectAttributes redirectAttributes) {
-//
-//        if (result.hasErrors()) {
-//            model.addAttribute("communities", communityService.getAllCommunities());
-//            return "post/create";
-//        }
-//
-//        try {
-//            PostDto savedPost = postService.save(postDto);
-//            redirectAttributes.addFlashAttribute("success", "Post created successfully!");
-//            return "redirect:/posts/" + savedPost.getId();
-//        } catch (Exception e) {
-//            result.rejectValue("communityName", "error.postDto", e.getMessage());
-//            model.addAttribute("communities", communityService.getAllCommunities());
-//            return "post/create";
-//        }
-//    }
 @PostMapping("/create")
 public String createPost(
         @Valid @ModelAttribute PostDto postDto,
@@ -107,14 +84,7 @@ public String createPost(
         @RequestParam(value = "files", required = false) MultipartFile[] files,
         Model model,
         RedirectAttributes redirectAttributes) {
-//    System.out.println(postDto.getTitle());
-//    System.out.println(postDto.getContent());
 
-//    if (result.hasErrors()) {
-//        System.out.println("error");
-//        model.addAttribute("communities", communityService.getAllCommunities());
-//        return "post/create";
-//    }
         System.out.println(postDto.getTitle());
     System.out.println(postDto.getContent());
     if (result.hasErrors()) {
@@ -191,20 +161,17 @@ public String createPost(
         if (result.hasErrors()) {
             model.addAttribute("communities", communityService.getAllCommunities());
             model.addAttribute("existingFiles", postService.getPostFiles(id));
-            System.out.println("in error part ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "post/edit";
         }
 
         try {
             postService.updatePostWithFiles(id, postDto, files, deleteFileIds);
             redirectAttributes.addFlashAttribute("success", "Post updated successfully!");
-            System.out.println("Success ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "redirect:/posts/" + id;
         } catch (Exception e) {
             result.rejectValue("title", "error.postDto", e.getMessage());
             model.addAttribute("communities", communityService.getAllCommunities());
             model.addAttribute("existingFiles", postService.getPostFiles(id));
-            System.out.println("in the catch block ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "post/edit";
         }
     }

@@ -3,7 +3,6 @@ package com.reddit.clone.controller;
 import com.reddit.clone.dto.CommentDto;
 import com.reddit.clone.entity.Comment;
 import com.reddit.clone.service.CommentService;
-import com.reddit.clone.util.TimeAgoUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
