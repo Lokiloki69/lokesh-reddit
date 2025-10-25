@@ -32,65 +32,49 @@ public class PostService {
     private final CommunityRepository communityRepository;
     private final PostMapper postMapper;
     private final CloudinaryService cloudinaryService;
-   // private final PostSearchRepository postSearchRepository;
-    // private final AuthService authService; // Will be added later
 
-//    public PostDto save(PostDto postDto) {
-//        Community community = communityRepository.findByName(postDto.getCommunityName())
-//                .orElseThrow(() -> new CommunityNotFoundException("Community not found: " + postDto.getCommunityName()));
-//
-//        Post post = postMapper.mapDtoToEntity(postDto);
-//        post.setCommunity(community);
-//        // post.setUser(authService.getCurrentUser()); // Will be added later
-//
-//        Post savedPost = postRepository.save(post);
-//        log.info("Post created: {}", savedPost.getTitle());
-//
-//        return postMapper.mapEntityToDto(savedPost);
-//    }
-public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
-    System.out.println("inside savepostWithfiles method");
-    log.info("Saving post: {}", postDto);
-    Community community = communityRepository.findByName(postDto.getCommunityName())
-            .orElseThrow(() -> new CommunityNotFoundException("Community not found"));
+    public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
+        System.out.println("inside savepostWithfiles method");
+        log.info("Saving post: {}", postDto);
+        Community community = communityRepository.findByName(postDto.getCommunityName())
+                .orElseThrow(() -> new CommunityNotFoundException("Community not found"));
 
-    Post post = postMapper.mapDtoToEntity(postDto);
-    post.setCommunity(community);
-    System.out.println(post.getTitle());
-    System.out.println(post.getContent());
+        Post post = postMapper.mapDtoToEntity(postDto);
+        post.setCommunity(community);
+        System.out.println(post.getTitle());
+        System.out.println(post.getContent());
 
-    List<PostFile> postFiles = new ArrayList<>();
+        List<PostFile> postFiles = new ArrayList<>();
 
-    for (MultipartFile file : files) {
-        if (file != null && !file.isEmpty()) {
-            String url = cloudinaryService.uploadFile(file);
-            System.out.println("Uploaded file URL: " + url);
-            log.info("Uploaded file to Cloudinary: {}", url);
+        for (MultipartFile file : files) {
+            if (file != null && !file.isEmpty()) {
+                String url = cloudinaryService.uploadFile(file);
+                System.out.println("Uploaded file URL: " + url);
+                log.info("Uploaded file to Cloudinary: {}", url);
 
-            PostFile postFile = PostFile.builder()
-                    .fileName(file.getOriginalFilename())
-                    .fileType(file.getContentType())
-                    .fileUrl(url)
-                    .post(post)
-                    .build();
+                PostFile postFile = PostFile.builder()
+                        .fileName(file.getOriginalFilename())
+                        .fileType(file.getContentType())
+                        .fileUrl(url)
+                        .post(post)
+                        .build();
 
-            postFiles.add(postFile);
+                postFiles.add(postFile);
+            }
+        }
+
+        post.setFiles(postFiles);
+
+        try {
+            Post saved = postRepository.save(post);
+            System.out.println("Saved post ID: " + saved.getId());
+            log.info("Saved post with id: {}", saved.getId());
+            return postMapper.mapEntityToDto(saved);
+        } catch (Exception e) {
+            log.error("Error saving post", e);
+            throw e;
         }
     }
-
-    post.setFiles(postFiles);
-
-    try {
-        Post saved = postRepository.save(post);
-        System.out.println("Saved post ID: " + saved.getId());
-        log.info("Saved post with id: {}", saved.getId());
-        return postMapper.mapEntityToDto(saved);
-    } catch (Exception e) {
-        log.error("Error saving post", e);
-        throw e;
-    }
-}
-
 
     @Transactional(readOnly = true)
     public PostDto getPostById(Long id) {
@@ -154,9 +138,6 @@ public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
         postRepository.deleteById(id);
         log.info("Post deleted with ID: {}", id);
     }
-//    public List<PostDocument> searchByTitleOrContent(String text) {
-//        return postSearchRepository.findByTitleContainingOrContentContaining(text, text);
-//    }
 
     public Page<Post> searchPosts(String text, Pageable pageable) {
         return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(text, text, pageable);
