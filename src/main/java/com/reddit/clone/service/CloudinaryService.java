@@ -36,8 +36,4 @@ public class CloudinaryService {
             throw new RuntimeException("Failed to upload file. Check file type and size.", e);
         }
     }
-
-    public void deleteFile(String fileUrl) {
-
-    }
 }

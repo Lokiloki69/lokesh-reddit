@@ -10,6 +10,7 @@ import com.reddit.clone.mapper.CommentMapper;
 import com.reddit.clone.repository.CommentRepository;
 import com.reddit.clone.repository.PostRepository;
 import com.reddit.clone.repository.UserRepository;
+import com.reddit.clone.service.auth.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,14 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentMapper commentMapper;
+    private final AuthService authService;
 
     public Comment save(CommentDto givenComment) {
         Post post = postRepository.findById(givenComment.getPostId())
                 .orElseThrow(() -> new PostNotFoundException(
                         "Post not found with ID: " + givenComment.getPostId()));
 
-        // For now, create a default user until authentication is implemented
-        User user = getOrCreateDefaultUser();
+        User user = authService.getCurrentUser();
 
         Comment comment = new Comment();
         comment.setText(givenComment.getText());

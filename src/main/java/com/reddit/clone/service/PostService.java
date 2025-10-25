@@ -6,6 +6,7 @@ import com.reddit.clone.entity.Community;
 import com.reddit.clone.entity.Post;
 //import com.reddit.clone.entity.PostDocument;
 import com.reddit.clone.entity.PostFile;
+import com.reddit.clone.entity.User;
 import com.reddit.clone.exception.CommunityNotFoundException;
 import com.reddit.clone.exception.PostNotFoundException;
 import com.reddit.clone.mapper.PostMapper;
@@ -13,6 +14,7 @@ import com.reddit.clone.repository.CommunityRepository;
 import com.reddit.clone.repository.PostFileRepository;
 import com.reddit.clone.repository.PostRepository;
 //import com.reddit.clone.repository.PostSearchRepository;
+import com.reddit.clone.service.auth.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,8 @@ public class PostService {
     private final PostFileRepository postFileRepository;
    // private final PostSearchRepository postSearchRepository;
     // private final AuthService authService; // Will be added later
+    private final AuthService authService;
+
 
     public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
         System.out.println("inside savepostWithfiles method");
@@ -48,8 +52,9 @@ public class PostService {
 
         Post post = postMapper.mapDtoToEntity(postDto);
         post.setCommunity(community);
-        System.out.println(post.getTitle());
-        System.out.println(post.getContent());
+
+        User user = authService.getCurrentUser();
+        post.setUser(user);
 
         List<PostFile> postFiles = new ArrayList<>();
 

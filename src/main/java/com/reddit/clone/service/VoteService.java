@@ -11,6 +11,7 @@ import com.reddit.clone.mapper.VoteMapper;
 import com.reddit.clone.repository.PostRepository;
 import com.reddit.clone.repository.UserRepository;
 import com.reddit.clone.repository.VoteRepository;
+import com.reddit.clone.service.auth.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class VoteService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final VoteMapper voteMapper;
+    private final AuthService authService;
 
     public void vote(VoteDto voteDto) {
         Post post = postRepository.findById(voteDto.getPostId())
@@ -34,7 +36,7 @@ public class VoteService {
                         "Post not found with ID: " + voteDto.getPostId()));
 
         // For now, use default user until authentication is implemented
-        User user = getOrCreateDefaultUser();
+        User user = authService.getCurrentUser();
 
         Optional<Vote> existingVote = voteRepository.findByPostAndUser(post, user);
 
@@ -73,7 +75,7 @@ public class VoteService {
                 .orElseThrow(() -> new PostNotFoundException(
                         "Post not found with ID: " + postId));
 
-        User user = getOrCreateDefaultUser();
+        User user = authService.getCurrentUser();
 
         Optional<Vote> vote = voteRepository.findByPostAndUser(post, user);
 

@@ -74,4 +74,12 @@ public class PostMapper{
                 .fileType(postFile.getFileType())
                 .build();
     }
+
+    public List<PostDto> mapEntityToDto(List<Post> posts) {
+        if (posts == null || posts.isEmpty()) return List.of(); // return empty list instead of null
+        return posts.stream()
+                .map(this::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -4,10 +4,23 @@ import com.reddit.clone.dto.UserDto;
 import com.reddit.clone.dto.UserViewDto;
 import com.reddit.clone.entity.User;
 import com.reddit.clone.entity.UserProfile;
+import com.reddit.clone.entity.VoteType;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 
 @Component
 public class UserMapper {
+
+    private final PostMapper postMapper;
+    private final VoteMapper voteMapper;
+    private final CommentMapper commentMapper;
+
+    public UserMapper(PostMapper postMapper, VoteMapper voteMapper, CommentMapper commentMapper) {
+        this.postMapper = postMapper;
+        this.voteMapper = voteMapper;
+        this.commentMapper = commentMapper;
+    }
 
     public UserDto mapEntityToDto(User user) {
         return UserDto.builder()
@@ -63,8 +76,13 @@ public class UserMapper {
                 .totalPosts(user.getPosts() != null ? user.getPosts().size() : 0)
                 .totalComments(user.getComments() != null ? user.getComments().size() : 0)
                 .totalCommunities(user.getCreatedCommunities() != null ? user.getCreatedCommunities().size() : 0)
+                .posts(postMapper.mapEntityToDto(user.getPosts()))
+                .comments(commentMapper.mapEntityToDto(user.getComments()))
+                .upvotedPosts(voteMapper.mapVoteEntityToDtoByType(user.getVotes(), VoteType.UPVOTE))
+                .downvotedPosts(voteMapper.mapVoteEntityToDtoByType(user.getVotes(),VoteType.DOWNVOTE))
                 .build();
     }
+
 
     private Integer calculateCommentKarma(User user) {
         if (user.getComments() == null || user.getComments().isEmpty()) {

@@ -6,6 +6,8 @@ import com.reddit.clone.entity.Post;
 import com.reddit.clone.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class CommentMapper {
 
@@ -16,5 +18,12 @@ public class CommentMapper {
                 .user(user)
                 .parentComment(parentComment)
                 .build();
+    }
+
+    public List<CommentDto> mapEntityToDto (List<Comment> comments) {
+        if (comments == null || comments.isEmpty()) return List.of();
+        return comments.stream()
+                .map(this::mapEntityToDto)
+                .toList();
     }
 }

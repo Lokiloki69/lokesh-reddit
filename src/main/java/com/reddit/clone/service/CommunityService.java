@@ -7,6 +7,7 @@ import com.reddit.clone.exception.CommunityNotFoundException;
 import com.reddit.clone.exception.RedditCloneException;
 import com.reddit.clone.mapper.CommunityMapper;
 import com.reddit.clone.repository.CommunityRepository;
+import com.reddit.clone.service.auth.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
     private final CommunityMapper communityMapper;
-    // private final AuthService authService; // Will be added later
+    private final AuthService authService; // Will be added later
 
     public CommunityDto save(CommunityDto communityDto) {
         if (communityRepository.existsByName(communityDto.getName())) {
@@ -31,7 +32,7 @@ public class CommunityService {
         }
 
         Community community = communityMapper.mapDtoToEntity(communityDto);
-        // community.setCreator(authService.getCurrentUser()); // Will be added later
+         community.setCreator(authService.getCurrentUser()); // Will be added later
 
         Community savedCommunity = communityRepository.save(community);
         communityDto.setId(savedCommunity.getId());

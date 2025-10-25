@@ -33,7 +33,6 @@ public class UserController {
         log.debug("User Data is {}", user);
         User newUser = userService.register(user);
         log.debug("It is in the Post Mapping {}", newUser);
-//        return "redirect:/user/" + newUser.getUsername();
         return "redirect:/login";
     }
 
@@ -51,6 +50,8 @@ public class UserController {
     public String viewUserPosts(@PathVariable String username, Model model) {
         UserViewDto userView = userService.getUserView(username);
 
+        log.debug("User posts {}", userView);
+
         model.addAttribute("userView", userView);
         model.addAttribute("activeTab", "posts");
 
@@ -66,5 +67,31 @@ public class UserController {
 
         return "user/view";
     }
+
+    @GetMapping("/user/{username}/upvoteposts")
+    public String viewUserUpvotePosts(@PathVariable String username, Model model) {
+        UserViewDto userView = userService.getUserView(username);
+
+        log.debug("User posts {}", userView);
+
+        model.addAttribute("userView", userView);
+        model.addAttribute("activeTab", "upvoteposts");
+
+        return "user/view";
+    }
+
+    @GetMapping("/user/{username}/downposts")
+    public String viewUserDownPosts(@PathVariable String username, Model model) {
+        UserViewDto userView = userService.getUserView(username);
+
+        log.debug("User posts {}", userView);
+
+        model.addAttribute("userView", userView);
+        model.addAttribute("activeTab", "downposts");
+
+        return "user/view";
+    }
+
+
 }
 

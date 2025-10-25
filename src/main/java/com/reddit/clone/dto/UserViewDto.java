@@ -37,4 +37,7 @@ public class UserViewDto {
     private List<PostDto> posts;
     private List<CommentDto> comments;
     private List<CommunityDto> communities;
+    private List<PostDto> upvotedPosts;
+    private List<PostDto> downvotedPosts;
+
 }

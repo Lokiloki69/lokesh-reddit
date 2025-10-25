@@ -50,21 +50,28 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link"
+                       th:classappend="${activeTab == 'saved'} ? 'active' : ''"
+                       th:href="@{'/user/' + ${userView.username} + '/saved'}">
                         <i class="bi bi-bookmark"></i> Saved
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link"
+                       th:classappend="${activeTab == 'upvoted'} ? 'active' : ''"
+                       th:href="@{'/user/' + ${userView.username} + '/upvoteposts'}">
                         <i class="bi bi-arrow-up-circle"></i> Upvoted
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link"
+                       th:classappend="${activeTab == 'downvoted'} ? 'active' : ''"
+                       th:href="@{'/user/' + ${userView.username} + '/downposts'}">
                         <i class="bi bi-arrow-down-circle"></i> Downvoted
                     </a>
                 </li>
             </ul>
+
 
             <!-- Tab Content -->
             <div class="tab-content">
@@ -111,10 +118,10 @@
                                 <small class="text-muted">
                                     Commented on <a th:href="@{'/posts/' + ${comment.postId}}">post</a>
                                 </small>
-                                <p class="mt-2" th:text="${comment.content}">Comment content...</p>
-                                <div class="d-flex gap-3 text-muted small">
-                                    <span><i class="bi bi-arrow-up"></i> <span th:text="${comment.voteCount}">0</span></span>
-                                </div>
+                                <p class="mt-2" th:text="${comment.text}">Comment text...</p>
+<!--                                <div class="d-flex gap-3 text-muted small">-->
+<!--                                    <span><i class="bi bi-arrow-up"></i> <span th:text="${comment.voteCount}">0</span></span>-->
+<!--                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -124,6 +131,63 @@
                         <p class="text-muted mt-3">No comments yet</p>
                     </div>
                 </div>
+
+                <!-- Upvote Tab -->
+                <div th:if="${activeTab == 'upvoteposts'}">
+                    <div th:if="${userView.upvotedPosts != null and #lists.size(userView.upvotedPosts) > 0}">
+                        <div th:each="post : ${userView.upvotedPosts}" class="card mb-3">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Posted in r/<span th:text="${post.communityName}">community</span>
+                                </small>
+                                <h5 class="mt-2">
+                                    <a th:href="@{'/posts/' + ${post.id}}"
+                                       class="text-decoration-none text-dark"
+                                       th:text="${post.title}">Post Title</a>
+                                </h5>
+                                <p class="text-muted" th:text="${post.content}">Post content...</p>
+                                <div class="d-flex gap-3 text-muted small">
+                                    <span><i class="bi bi-arrow-up"></i> <span th:text="${post.voteCount}">0</span></span>
+                                    <span><i class="bi bi-chat"></i> Comments</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${userView.posts == null or #lists.isEmpty(userView.posts)}"
+                         class="text-center py-5">
+                        <i class="bi bi-file-post display-1 text-muted"></i>
+                        <p class="text-muted mt-3">No posts yet</p>
+                    </div>
+                </div>
+
+                <!-- DownVote Tab -->
+                <div th:if="${activeTab == 'downposts'}">
+                    <div th:if="${userView.downvotedPosts != null and #lists.size(userView.downvotedPosts) > 0}">
+                        <div th:each="post : ${userView.downvotedPosts}" class="card mb-3">
+                            <div class="card-body">
+                                <small class="text-muted">
+                                    Posted in r/<span th:text="${post.communityName}">community</span>
+                                </small>
+                                <h5 class="mt-2">
+                                    <a th:href="@{'/posts/' + ${post.id}}"
+                                       class="text-decoration-none text-dark"
+                                       th:text="${post.title}">Post Title</a>
+                                </h5>
+                                <p class="text-muted" th:text="${post.content}">Post content...</p>
+                                <div class="d-flex gap-3 text-muted small">
+                                    <span><i class="bi bi-arrow-up"></i> <span th:text="${post.voteCount}">0</span></span>
+                                    <span><i class="bi bi-chat"></i> Comments</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${userView.posts == null or #lists.isEmpty(userView.posts)}"
+                         class="text-center py-5">
+                        <i class="bi bi-file-post display-1 text-muted"></i>
+                        <p class="text-muted mt-3">No posts yet</p>
+                    </div>
+                </div>
+
             </div>
         </div>
 

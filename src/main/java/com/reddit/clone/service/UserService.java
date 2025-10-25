@@ -28,6 +28,7 @@ public class UserService {
             if (attempts > 10) {
                 throw new RuntimeException("Failed to generate unique username");
             }
+            attempts++;
         } while (userRepository.existsByUsername(username));
         return username;
     }
@@ -69,6 +70,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // We have to this in the mappper , Modify Later
     public UserViewDto getUserView(String username) {
         User user = userRepository.findByUsernameWithProfile(username)
                 .orElseThrow(() -> new RedditCloneException("User not found: " + username));
