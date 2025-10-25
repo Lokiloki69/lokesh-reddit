@@ -10,6 +10,7 @@ import com.reddit.clone.exception.CommunityNotFoundException;
 import com.reddit.clone.exception.PostNotFoundException;
 import com.reddit.clone.mapper.PostMapper;
 import com.reddit.clone.repository.CommunityRepository;
+import com.reddit.clone.repository.PostFileRepository;
 import com.reddit.clone.repository.PostRepository;
 //import com.reddit.clone.repository.PostSearchRepository;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,9 @@ public class PostService {
     private final CommunityRepository communityRepository;
     private final PostMapper postMapper;
     private final CloudinaryService cloudinaryService;
+    private final PostFileRepository postFileRepository;
+   // private final PostSearchRepository postSearchRepository;
+    // private final AuthService authService; // Will be added later
 
     public PostDto savePostWithFiles(PostDto postDto, MultipartFile[] files) {
         System.out.println("inside savepostWithfiles method");
@@ -78,6 +82,7 @@ public class PostService {
             throw e;
         }
     }
+
 
     @Transactional(readOnly = true)
     public PostDto getPostById(Long id) {
@@ -188,15 +193,11 @@ public class PostService {
 
         // Delete marked files
         if (deleteFileIds != null && !deleteFileIds.isEmpty()) {
-            post.getFiles().removeIf(file -> {
-                if (deleteFileIds.contains(file.getId())) {
-                    // Optionally delete from Cloudinary
-                    // cloudinaryService.deleteFile(file.getFileUrl());
-                    log.info("Deleted file: {}", file.getFileName());
-                    return true;
-                }
-                return false;
-            });
+            postFileRepository.deleteByIdIn(deleteFileIds);
+            log.info("Deleted {} files from database", deleteFileIds.size());
+
+            // Also remove from the post's file list to keep in-memory state consistent
+            post.getFiles().removeIf(file -> deleteFileIds.contains(file.getId()));
         }
 
         // Add new files

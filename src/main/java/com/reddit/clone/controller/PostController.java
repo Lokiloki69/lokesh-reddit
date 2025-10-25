@@ -159,6 +159,7 @@ public String createPost(
 
         // Add this to fix the voteDto binding error
         model.addAttribute("voteDto", new VoteDto());
+        model.addAttribute("existingFiles", postService.getPostFiles(id)); // Get existing files
 
         return "post/view";
     }
@@ -190,17 +191,20 @@ public String createPost(
         if (result.hasErrors()) {
             model.addAttribute("communities", communityService.getAllCommunities());
             model.addAttribute("existingFiles", postService.getPostFiles(id));
+            System.out.println("in error part ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "post/edit";
         }
 
         try {
             postService.updatePostWithFiles(id, postDto, files, deleteFileIds);
             redirectAttributes.addFlashAttribute("success", "Post updated successfully!");
+            System.out.println("Success ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "redirect:/posts/" + id;
         } catch (Exception e) {
             result.rejectValue("title", "error.postDto", e.getMessage());
             model.addAttribute("communities", communityService.getAllCommunities());
             model.addAttribute("existingFiles", postService.getPostFiles(id));
+            System.out.println("in the catch block ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             return "post/edit";
         }
     }
